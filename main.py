@@ -24,7 +24,7 @@ def pcinfo():
         info.append({unname.version})
         info.append({unname.machine})
         info.append({unname.processor})
-        # date and time pc was booted
+        # date and time pc was booted 
         boot_time_timestamp = psutil.boot_time()
         bt = datetime.fromtimestamp(boot_time_timestamp)
         btt = f'{bt.year}/{bt.month}/{bt.day} {bt.hour}:{bt.minute}:{bt.second}'
